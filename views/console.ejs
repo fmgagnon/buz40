@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+	   <meta charset = "utf-8" />
+	      <title>buz40 : Console</title>
+
+
+<!-- Chargement des prérequis : Bootstrap, jQuery (nécessaire?), popper (nécessaire?) -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+      <script src="/socket.io/socket.io.js"></script>      
+      <script src="/chemin.js"></script>
+      
+      <style>
+.buz40-bouton-souligne {border:3px solid #000000;}
+
+</style>
+      
+      
+
+<script>
+
+	// Initialisations
+	var noPlateau = <%= noPlateau %>;
+	var nomRegie = '<%= nomRegie %>';
+	var numeroBouton = <%= numeroBouton %>;
+	var nomJuge = "<%= nomJuge %>";
+	var urlBase = racineURL + 'bouton/?no=';
+	console.log(noPlateau);
+	
+	var i = 0;
+	var iAffichageJoueurs = 0;
+	var iAffichageLumieres = 0;
+	var iAffichageFeuille = 0;
+	var iConfig = 0;
+	var iAjustPointage = 0;
+	var iDebuzz = 0;
+	var iExport = 0;
+	
+	
+	
+	var serveur = io.connect(racineURL);
+	var plateau = io.connect(racineURL + noPlateau);
+	
+	var delaiDebuzz = 3500;																										
+ 
+	var joueursPlateau = [];
+	var equipeA = [];
+	var equipeB = [];
+	var contenuAffichageJoueurs = ''
+	var contenuAffichageLumieres = '';
+	var contenuAffichageFeuille = '';
+
+	var trouveJoueur;
+	var pointageA = 0;
+	var pointageB = 0;
+	
+	var nomEquipeA = "";
+	var nomEquipeB = "";
+	
+	var autodebuzz;
+	var resultatExport = "";
+
+
+	
+	
+	function majConfig(){
+
+		nomEquipeA = document.getElementById("nomEquipeA").value;
+		nomEquipeB = document.getElementById("nomEquipeB").value;
+		
+		joueursPlateau.concat(equipeA);		
+		joueursPlateau.concat(equipeB);
+		console.log("tous les joueurs dans la liste commune");
+		console.log(joueursPlateau);
+		
+		for (iConfig = 0; iConfig < joueursPlateau.length; iConfig++) {
+		
+			document.getElementById("configNom" + iConfig).innerHTML = joueursPlateau[iConfig].nomJoueur;
+			if (document.getElementById("eAJoueur" + iConfig).checked) {
+				joueursPlateau[iConfig].equipe = "A";
+			} else if (document.getElementById("eBJoueur" + iConfig).checked) {
+				joueursPlateau[iConfig].equipe = "B";
+			};
+			console.log("majconfig" + iConfig +" : le joueur" + joueursPlateau[iConfig].nomJoueur + "va dans l'équipe " + joueursPlateau[iConfig].equipe + ".");			
+		};
+		
+		// Rafraîchissement des équipes
+		equipeA = joueursPlateau.filter((joueur) => { return joueur.equipe == "A"; });
+		equipeB = joueursPlateau.filter((joueur) => { return joueur.equipe == "B"; });		
+		
+		
+		delaiDebuzz = document.getElementById("nouveauDelai").value;		
+		
+		console.log("A :");
+		console.log(equipeA);
+		console.log("B :");
+		console.log(equipeB);
+		console.log("tous")
+		console.log(joueursPlateau);
+		
+		majAffichageLumieres();
+		document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
+				
+		majAffichageJoueurs();
+		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
+
+		
+		majAffichageFeuille();
+		document.getElementById("affichageFeuille").innerHTML = contenuAffichageFeuille;	
+		
+		
+		if (document.getElementById("pointageSecret").checked) {
+			document.getElementById("scoreA").style.visibility = "hidden";
+			document.getElementById("scoreB").style.visibility = "hidden";
+			console.log("secret");
+		} else {
+			document.getElementById("scoreA").style.color = "black";
+			document.getElementById("scoreB").style.color = "black";
+		};	
+	
+	debuzz();
+	
+		
+	};
+
+
+	function supprimeJoueur(numeroJoueur){
+		// supprimer et réorganiser
+		console.log('supprime', joueursPlateau[numeroJoueur].nomJoueur)
+		document.getElementById("configNom" + numeroJoueur).innerHTML = '';
+		joueursPlateau.splice(numeroJoueur, 1);
+				console.log(joueursPlateau);
+
+		majConfig();
+		
+
+	}
+
+	
+	// Affichage de la fenêtre de configuration
+	function majAffichageJoueurs() {
+	
+		contenuAffichageJoueurs = '<center><table border=1><tr><td>nom</td><td>équipe</td><td></td></tr>'
+	
+		for (iAffichageJoueurs = 0; (iAffichageJoueurs < joueursPlateau.length); iAffichageJoueurs++) { 
+			contenuAffichageJoueurs += '<tr><td id="configNom' + iAffichageJoueurs + '">' + joueursPlateau[iAffichageJoueurs].nomJoueur + '</td>'+
+			'<td>'+
+			'A<input type="radio" name="equipeJoueur'+ iAffichageJoueurs +'" id="eAJoueur' + iAffichageJoueurs + '">'+
+			'<input type="radio" name="equipeJoueur'+ iAffichageJoueurs +'" id="eBJoueur' + iAffichageJoueurs + '">'+'B</td>'+
+			'<td><button type="button" class="btn btn-sm btn-warning" onclick="supprimeJoueur(' + iAffichageJoueurs + ')">supprimer</button></td>';
+			
+			// Identifier l'équipe sur le bouton radio.
+			// Ne fonctionne pas pour l'instant. Pourquoi? Je ne sais pas.
+			// Le IF fonctionne.
+			
+			
+			if (joueursPlateau[iAffichageJoueurs].equipe == "A") {
+				document.getElementById("eAJoueur" + iAffichageJoueurs).checked = true;
+				
+			} else if (joueursPlateau[iAffichageJoueurs].equipe == "B") {
+				document.getElementById("eBJoueur" + iAffichageJoueurs).checked = true;
+			};
+			
+			
+		};
+		contenuAffichageJoueurs += '</tr></table></center>';
+	
+	}
+
+
+	// Affichage de la console
+	function majAffichageLumieres(){
+	
+	contenuAffichageLumieres = '<div class="row">'+
+								'<div class="col-sm">'+
+								'<h2>Équipe A ('+ nomEquipeA + ') : <span id="scoreA">0</span></h2>';
+	
+		for (iAffichageLumieres = 0; iAffichageLumieres < (equipeA.length); iAffichageLumieres++) { 
+			contenuAffichageLumieres += '<button type="button" class="btn btn-secondary" id="lum' + equipeA[iAffichageLumieres].noSeqBouton + '">' + equipeA[iAffichageLumieres].nomJoueur + '</button>'+
+			'<button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeA[iAffichageLumieres].noSeqBouton + ', -10)">-10</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeA[iAffichageLumieres].noSeqBouton + ', 10)">+10</button><br /><br />'			
+		};
+
+
+		// Colonne du milieu
+		contenuAffichageLumieres += '</div>'+
+						'<div class="col-sm">'+
+						'<button type="button" class="btn btn-info" onClick="debuzz();">Réarmer</button> <br /><br />'+
+						'<button type="button" class="btn btn-success" onClick="ajustPointage(joueurSelect,10);">Bonne réponse (+10)</button><br /><br />'+
+						'<button type="button" class="btn btn-danger" onClick="ajustPointage(joueurSelect,-10);">Pénalité (-10)</button><br />'+
+						'<br /><br />'+
+						'<button type="button" class="btn btn-sm btn-info"  data-toggle="modal" data-target="#feuillePointage" >Feuille de pointage</button>';
+
+		// Équipe B
+		contenuAffichageLumieres += '</div>'+
+		'<div class="col-sm">'+
+		'<h2>Équipe B ('+ nomEquipeB + ') : <span id="scoreB">0</span></h2>';
+		
+		for (iAffichageLumieres = 0; iAffichageLumieres < (equipeB.length); iAffichageLumieres++) { 
+			contenuAffichageLumieres +='<button type="button" class="btn btn-secondary" id="lum' + equipeB[iAffichageLumieres].noSeqBouton + '">' + equipeB[iAffichageLumieres].nomJoueur + '</button>'+
+			'<button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeB[iAffichageLumieres].noSeqBouton + ', -10)">-10</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeB[iAffichageLumieres].noSeqBouton + ', 10)">+10</button><br /><br />';			
+		};
+
+		contenuAffichageLumieres +='</div></div>';
+
+		
+	
+	};
+
+
+
+
+
+
+	// Affichage de la feuille de pointage
+	function majAffichageFeuille() {
+		contenuAffichageFeuille = '';
+		contenuAffichageFeuille += '<div class="row">'+
+								'<div class="col-sm">'+
+								'<table border=1 align=center>'+
+								'<tr>'+
+								'<td><strong>Équipe A ('+ nomEquipeA + ')</strong></td>'+
+								'<td id="score2A"><strong>' + pointageA + '</strong/</td>'+
+								'<td>ajustement</td></tr>';
+	
+		for (iAffichageFeuille = 0; iAffichageFeuille < (equipeA.length); iAffichageFeuille++) { 
+			contenuAffichageFeuille += '<tr><td>' + equipeA[iAffichageFeuille].nomJoueur +
+										'</td>'+
+										'<td>' + equipeA[iAffichageFeuille].score + '</td>'+
+										'<td><button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeA[iAffichageFeuille].noSeqBouton + ', -10)">-10</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeA[iAffichageFeuille].noSeqBouton + ', 10)">+10</button></td></tr>';
+			};
+
+		// Équipe B
+		contenuAffichageFeuille += '</table></div>'+
+								'<div class="col-sm">'+
+								'<table border=1 align=center>'+
+								'<tr>'+
+								'<td><strong>Équipe B ('+ nomEquipeB + ')</strong></td>'+
+								'<td id="score2B"><strong>' + pointageB + '</strong/</td>'+
+								'<td>ajustement</td></tr>';
+	
+		for (iAffichageFeuille = 0; iAffichageFeuille < (equipeB.length); iAffichageFeuille++) { 
+			contenuAffichageFeuille += '<tr><td>' + equipeB[iAffichageFeuille].nomJoueur +
+										'</td>'+
+										'<td>' + equipeB[iAffichageFeuille].score + '</td>'+
+										'<td><button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeB[iAffichageFeuille].noSeqBouton + ', -10)">-10</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeB[iAffichageFeuille].noSeqBouton + ', 10)">+10</button></td></tr>';
+			};
+
+		contenuAffichageFeuille +='</div></div>';
+		document.getElementById("affichageFeuille").innerHTML = contenuAffichageFeuille;
+		
+		document.getElementById("score2A").innerHTML = pointageA;
+		document.getElementById("score2B").innerHTML = pointageB;
+	
+	}
+
+
+
+	// Gestion du pointage
+	
+	function ajustPointage(joueurMarque, evenement) {	
+		
+		if (joueurMarque === '') {
+		} else {
+		trouveJoueur = joueursPlateau.findIndex(joueur => joueur.noSeqBouton === joueurMarque);
+		console.log(trouveJoueur);
+		joueursPlateau[trouveJoueur].score += evenement; 
+		
+		pointageA = 0;
+		for (iAjustPointage = 0; iAjustPointage < (equipeA.length); iAjustPointage++) { 
+			pointageA += equipeA[iAjustPointage].score;			
+		};
+		
+		pointageB = 0;
+		for (iAjustPointage = 0; iAjustPointage < (equipeB.length); iAjustPointage++) { 
+			pointageB += equipeB[iAjustPointage].score;			
+		};
+		majAffichageFeuille();
+		document.getElementById("scoreA").innerHTML = pointageA;
+		document.getElementById("scoreB").innerHTML = pointageB;
+
+		document.getElementById("score2A").innerHTML = pointageA;
+		document.getElementById("score2B").innerHTML = pointageB;
+	
+	// on finit en débuzzant
+	debuzz();
+	};
+};
+	
+
+
+
+	// Gestion des messages
+
+    plateau.on('allo', function(msg){
+ 		console.log('allo', msg.nomJoueur);
+
+			joueursPlateau.push({"nomJoueur" : msg.nomJoueur,
+								 "noSeqBouton" : msg.noSeqBouton,
+								 "equipe" : '',
+								 "score" : 0});			
+			console.log(joueursPlateau);
+			majAffichageJoueurs();
+		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
+		
+		for (iAffichageJoueurs = 0; (iAffichageJoueurs < joueursPlateau.length); iAffichageJoueurs++) { 
+			if (joueursPlateau[iAffichageJoueurs].equipe == "A") {
+				document.getElementById("eAJoueur" + iAffichageJoueurs).checked = true;
+			} else if (joueursPlateau[iAffichageJoueurs].equipe == "B") {
+				document.getElementById("eBJoueur" + iAffichageJoueurs).checked = true;
+			};
+		};
+		
+		
+		
+	});
+
+
+		plateau.on('droitReponse', function (msg) {
+
+		for (iDebuzz = 0; iDebuzz < joueursPlateau.length; iDebuzz++) { 
+			document.getElementById("lum" + 								
+				joueursPlateau[iDebuzz].noSeqBouton).classList.remove("btn-danger");
+			document.getElementById("lum" + 								
+joueursPlateau[iDebuzz].noSeqBouton).classList.remove("buz40-bouton-souligne");
+			document.getElementById("lum" + 
+				joueursPlateau[iDebuzz].noSeqBouton).classList.remove("btn-dark");
+			document.getElementById("lum" + 								
+joueursPlateau[iDebuzz].noSeqBouton).classList.remove("buz40-bouton-souligne");
+		};
+	
+		clearTimeout(autodebuzz);
+		console.log(msg);
+		joueurSelect = msg;
+		// on remet les boutons à leur couleur d'origine.
+		for (iDebuzz = 0; i < joueursPlateau.length; i++) { 
+			document.getElementById("lum" + 								
+				joueursPlateau[i].noSeqBouton).classList.remove("btn-danger");
+			document.getElementById("lum" + 								
+
+				joueursPlateau[i].noSeqBouton).classList.remove("buz40-bouton-souligne");
+				
+			document.getElementById("lum" + 								
+				joueursPlateau[i].noSeqBouton).classList.remove("btn-dark");
+			document.getElementById("lum" + 								
+				joueursPlateau[i].noSeqBouton).classList.remove("buz40-bouton-souligne");
+		};
+		
+		// On allume la bonne lumière et on fait jouer le son
+		document.getElementById("lum" + msg).classList.add("btn-danger");
+		document.getElementById("lum" + msg).classList.add("buz40-bouton-souligne");
+		document.getElementById('ding').play();
+ 		autodebuzz = setTimeout(autoDebuzz, delaiDebuzz);
+		
+		
+	});
+
+	
+	function autoDebuzz() {	
+		window.plateau.emit('debuzz');
+		document.getElementById("lum" + joueurSelect).classList.remove("btn-danger");
+		document.getElementById("lum" + joueurSelect).classList.add("btn-dark");
+	};
+
+
+	function debuzz() {
+		joueurSelect ='';
+		window.plateau.emit('debuzz');
+	
+		// on remet les boutons à leur couleur d'origine.
+		for (iDebuzz = 0; iDebuzz < joueursPlateau.length; iDebuzz++) { 
+			document.getElementById("lum" + 								
+				joueursPlateau[iDebuzz].noSeqBouton).classList.remove("btn-danger");
+			document.getElementById("lum" + 
+				joueursPlateau[iDebuzz].noSeqBouton).classList.remove("btn-dark");
+		};
+	};
+
+	
+	
+	
+		
+
+debuzz();
+
+
+function changementDelai(){
+	delaiDebuzz = document.getElementById("nouveauDelai").value;
+	console.log(delaiDebuzz)
+	document.getElementById("delaiDebuzz").innerHTML = delaiDebuzz;
+}
+
+
+function envoiResultat(){
+
+
+
+	resultatExport = "";
+	resultatExport += "'" + noPlateau + "'," + 
+					"'" + nomJuge + "'," + 
+					"'" + nomEquipeA + "'," + 
+					"'" + pointageA + "',"+
+					"'" + nomEquipeB + "'," + 
+					"'" + pointageB + "',"+
+					"'" + new Date().toISOString() + "',";				
+
+	for (iExport = 0; iExport < (equipeA.length); iExport++) { 
+		resultatExport += "'" + equipeA[iAjustPointage].nomJoueur + "'," +
+						  "'" + nomEquipeA + "'," + 	 	
+						  "'" + equipeA[iAjustPointage].score + "',";			
+		}; 
+
+	for (iExport = 0; iExport < (equipeB.length); iExport++) { 
+		resultatExport += "'" + equipeB[iAjustPointage].nomJoueur + "'," + 	
+						  "'" + equipeB[iAjustPointage].score + "',";			
+		};
+	
+	resultatExport += "''"
+
+	console.log(resultatExport);
+	window.plateau.emit('ajoutResultat', resultatExport);
+
+};
+
+</script>
+</head>
+    
+
+
+
+<body>
+<div class="container">         
+
+
+    <div class="jumbotron">
+      <div class="container">
+        <h1><script>document.write(nomRegie)</script> - plateau  <script>document.write(nomJuge)</script></h1>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="boutonInscription" onclick="window.plateau.emit('rouvert', {noPlateau: noPlateau});">
+Configurer la partie</button> <button type="button" style="visibility:hidden" class="btn btn-secondary" id="lum0"></button><br /><br />
+      </div>
+	</div>
+	
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <div class="modal-body">
+      <strong>Premièrement</strong>, envoyez ce lien aux gens qui s'apprêtent à jouer&nbsp;: <br /><code><script>document.write(urlBase + numeroBouton);</script></code>
+      <hr>
+      
+      <strong>Ensuite</strong>, organisez les équipes : <br />
+Équipe A : <input type="text" id="nomEquipeA" maxlength=3 size=3>.
+Équipe B : <input type="text" id="nomEquipeB" maxlength=3 size=3>.<br />
+<div class="container" id="affichageJoueurs">
+      
+<script>
+majAffichageJoueurs();
+		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
+			
+</script>
+
+</div>
+<hr>
+<strong>Options : </strong><br />
+Garder le pointage secret (pour partage d'écran)&nbsp;:<input type="checkbox" id="pointageSecret"><br />
+Délai de réarmement automatique&nbsp;: <input type="range" id="nouveauDelai" min="3500" max="10000" value="3500" onchange="changementDelai();"><span id="delaiDebuzz">3500</span> ms.<br />
+
+      </small>
+      </div>
+      
+      <div class="modal-footer">
+      Afin d'entendre une sonnette, faites jouer ce son : 
+<audio src="http://buz40.com/ding.wav" id="ding" controls=yes></audio> 
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.plateau.emit('ferme', {noPlateau: noPlateau}); majConfig(); console.log('prêt');">Prêt</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<div class="container" id="affichageLumieres">
+<script>
+		majAffichageLumieres();
+		document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
+</script>
+
+</div>
+
+
+
+
+<div class="modal fade" id="feuillePointage" tabindex="-1" role="dialog" aria-labelledby="labelFeuillePointage" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="labelFeuillePointage">Feuille de pointage</h5>
+
+      </div>
+      <div class="modal-body">
+      <div class="container" id="affichageFeuille">
+      </div>
+      
+      </div>
+      
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cacher</button>
+
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+</div>
+</head>
+</html>
