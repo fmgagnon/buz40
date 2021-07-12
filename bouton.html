@@ -99,9 +99,9 @@
 
 
 // pas très chic, mais permet de buzzer avec ENTER
-	document.addEventListener("keyup", function(event) {
+	document.addEventListener("keydown", function(event) {
   	// Number 13 is the "Enter" key on the keyboard
-  		if (event.keyCode === 13) {
+  		if (event.keyCode === 66) {
     	// Cancel the default action, if needed
    		 event.preventDefault();
    		 // Trigger the button element with a click
@@ -162,7 +162,7 @@
  <button class="btn-primary btn-lg" onClick="buzz();" id="buzzeur" role="button">BUZZ</button></p>
 
 <p><small><strong>Trucs&nbsp;:</strong><br />
-Vous pouvez utiliser <key>Entrée</key> pour buzzer. <br />
+Vous pouvez utiliser <key>Entrée</key> ou <key>Espace</key> pour buzzer. <br />
 Si vous utilisez la souris, la combinaison <kbd>Ctrl</kbd>+<kbd>+</kbd> pourrait être utile pour faire grossir le bouton. </small></p> 
       </div>
     </div>
