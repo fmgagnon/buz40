@@ -26,8 +26,6 @@
 
 	// Identification du joueur
 	function identification() {
-		document.getElementById("bouton").style.display = "inline";	
-		document.getElementById("formulaireID").style.display = "none";	
 		window.nomJoueur = document.getElementById("formJoueur").value;
 		window.cherchePlateau = document.getElementById("formPlateau").value;
 		nomJoueur.replace(/[.*+?^${}()|[\]\\]/g, '_');
@@ -50,6 +48,8 @@
 	// Entrée sur un plateau acceptée
 	var numeroPlateau = undefined;
 	serveur.on('bienvenue', function(msg){
+		document.getElementById("bouton").style.display = "inline";	
+		document.getElementById("formulaireID").style.display = "none";	
 		numeroPlateau = msg.numeroPlateau;
 		nomJuge = msg.nomJuge
 		window.alert("Bienvenue sur le plateau!", numeroPlateau);
