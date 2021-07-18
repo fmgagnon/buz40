@@ -27,6 +27,7 @@
 	var numeroBouton = <%= numeroBouton %>;
 	var nomJuge = "<%= nomJuge %>";
 	var urlBase = racineURL + 'bouton/?no=';
+	var urlBouton = urlBase + numeroBouton;
 	console.log(noPlateau);
 	
 	var i = 0;
@@ -62,8 +63,13 @@
 	var autodebuzz;
 	var resultatExport = "";
 
-
-	
+	// fonction appelée au moment où la page est loadée
+	function initialisation()
+	{
+		// Certains joueurs se plaignent que le volume de la sonnette est trop fort...
+		// Initialisons-le à 50% par défaut.
+		document.getElementById("ding").volume = 0.5;
+	}
 	
 	function majConfig(){
 
@@ -252,7 +258,6 @@
 		
 		document.getElementById("score2A").innerHTML = pointageA;
 		document.getElementById("score2B").innerHTML = pointageB;
-	
 	}
 
 
@@ -391,6 +396,14 @@ function changementDelai(){
 	document.getElementById("delaiDebuzz").innerHTML = delaiDebuzz;
 }
 
+function copyToClipboard(text) {
+	navigator.clipboard.writeText(text).then(function () {
+		console.log('Async: Copying to clipboard was successful!');
+	}, function (err) {
+		console.error('Async: Could not copy text: ', err);
+	});
+}
+
 
 function envoiResultat(){
 
@@ -429,106 +442,92 @@ function envoiResultat(){
 
 
 
-<body>
-<div class="container">         
+<body onload="initialisation()">
+<div class="container">
+	<div class="jumbotron">
+		<div class="container">
+			<h1>
+				<script>document.write(nomRegie)</script> - plateau
+				<script>document.write(nomJuge)</script>
+			</h1>
 
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="boutonInscription" onclick="window.plateau.emit('rouvert', {noPlateau: noPlateau});">
+				Configurer la partie</button>
 
-    <div class="jumbotron">
-      <div class="container">
-        <h1><script>document.write(nomRegie)</script> - plateau  <script>document.write(nomJuge)</script></h1>
-
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="boutonInscription" onclick="window.plateau.emit('rouvert', {noPlateau: noPlateau});">
-Configurer la partie</button> <button type="button" style="visibility:hidden" class="btn btn-secondary" id="lum0"></button><br /><br />
-      </div>
+		</div>
 	</div>
-	
+	<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
 
+				<div class="modal-body">
+					<strong>Premièrement</strong>, envoyez ce lien aux gens qui s'apprêtent à jouer&nbsp;:
+					<br />
+					<code><script id="lienBouton">document.write(urlBouton);</script></code>
+					<button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard(urlBouton);">Copier</button>
+					<hr>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
+					<strong>Ensuite</strong>, organisez les équipes :
+					<br /> Équipe A :
+					<input type="text" id="nomEquipeA" maxlength=3 size=3>. Équipe B :
+					<input type="text" id="nomEquipeB" maxlength=3 size=3>.
+					<br />
+					<div class="container" id="affichageJoueurs">
+						<script>
+							majAffichageJoueurs();
+							document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
+						</script>
+					</div>
+					<hr>
+					<strong>Options : </strong>
+					<br /> Garder le pointage secret (pour partage d'écran)&nbsp;:
+					<input type="checkbox" id="pointageSecret">
+					<br /> Délai de réarmement automatique&nbsp;:
+					<input type="range" id="nouveauDelai" min="3500" max="10000" value="3500" onchange="changementDelai();">
+					<span id="delaiDebuzz">3500</span> ms.
+					<br />
+					<br />
+					Pour tester et ajuster le volume de la sonnette:
+					<br />
+					<audio src="http://buz40.com/ding.wav" id="ding" controls=yes></audio>
+				</div>
 
-      <div class="modal-body">
-      <strong>Premièrement</strong>, envoyez ce lien aux gens qui s'apprêtent à jouer&nbsp;: <br /><code><script>document.write(urlBase + numeroBouton);</script></code>
-      <hr>
-      
-      <strong>Ensuite</strong>, organisez les équipes : <br />
-Équipe A : <input type="text" id="nomEquipeA" maxlength=3 size=3>.
-Équipe B : <input type="text" id="nomEquipeB" maxlength=3 size=3>.<br />
-<div class="container" id="affichageJoueurs">
-      
-<script>
-majAffichageJoueurs();
-		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
-			
-</script>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.plateau.emit('ferme', {noPlateau: noPlateau}); majConfig(); console.log('prêt');">Prêt</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-</div>
-<hr>
-<strong>Options : </strong><br />
-Garder le pointage secret (pour partage d'écran)&nbsp;:<input type="checkbox" id="pointageSecret"><br />
-Délai de réarmement automatique&nbsp;: <input type="range" id="nouveauDelai" min="3500" max="10000" value="3500" onchange="changementDelai();"><span id="delaiDebuzz">3500</span> ms.<br />
+	<div class="container" id="affichageLumieres">
+		<script>
+			majAffichageLumieres();
+			document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
+		</script>
 
-      </small>
-      </div>
-      
-      <div class="modal-footer">
-      Afin d'entendre une sonnette, faites jouer ce son : 
-<audio src="http://buz40.com/ding.wav" id="ding" controls=yes></audio> 
-        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.plateau.emit('ferme', {noPlateau: noPlateau}); majConfig(); console.log('prêt');">Prêt</button>
-      </div>
-    </div>
-  </div>
-</div>
+	</div>
 
+	<div class="modal fade" id="feuillePointage" tabindex="-1" role="dialog" aria-labelledby="labelFeuillePointage" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="labelFeuillePointage">Feuille de pointage</h5>
 
+				</div>
+				<div class="modal-body">
+					<div class="container" id="affichageFeuille">
+					</div>
 
+				</div>
 
-
-<div class="container" id="affichageLumieres">
-<script>
-		majAffichageLumieres();
-		document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
-</script>
-
-</div>
-
-
-
-
-<div class="modal fade" id="feuillePointage" tabindex="-1" role="dialog" aria-labelledby="labelFeuillePointage" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="labelFeuillePointage">Feuille de pointage</h5>
-
-      </div>
-      <div class="modal-body">
-      <div class="container" id="affichageFeuille">
-      </div>
-      
-      </div>
-      
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Cacher</button>
-
-        
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Cacher</button>
+			</div>
+		</div>
+	</div>
 
 
 </div>
-
-
-
-
-
+</div>
 </div>
 </head>
 </html>
