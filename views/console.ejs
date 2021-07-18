@@ -150,24 +150,20 @@
 			'A<input type="radio" name="equipeJoueur'+ iAffichageJoueurs +'" id="eAJoueur' + iAffichageJoueurs + '">'+
 			'<input type="radio" name="equipeJoueur'+ iAffichageJoueurs +'" id="eBJoueur' + iAffichageJoueurs + '">'+'B</td>'+
 			'<td><button type="button" class="btn btn-sm btn-warning" onclick="supprimeJoueur(' + iAffichageJoueurs + ')">supprimer</button></td>';
-			
-			// Identifier l'équipe sur le bouton radio.
-			// Ne fonctionne pas pour l'instant. Pourquoi? Je ne sais pas.
-			// Le IF fonctionne.
-			
-			
+		};
+		contenuAffichageJoueurs += '</tr></table></center>';
+	
+		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
+
+		// Ajuster les équipes
+		for (iAffichageJoueurs = 0; (iAffichageJoueurs < joueursPlateau.length); iAffichageJoueurs++) { 
 			if (joueursPlateau[iAffichageJoueurs].equipe == "A") {
 				document.getElementById("eAJoueur" + iAffichageJoueurs).checked = true;
 				
 			} else if (joueursPlateau[iAffichageJoueurs].equipe == "B") {
 				document.getElementById("eBJoueur" + iAffichageJoueurs).checked = true;
 			};
-			
-			
-		};
-		contenuAffichageJoueurs += '</tr></table></center>';
-	
-		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
+		}
 	}
 
 
