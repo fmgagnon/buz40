@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html>
-	   <meta charset = "utf-8" />
-	      <title>buz40 : bouton</title>
-		  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-      <script src="/socket.io/socket.io.js"></script>
-      
-      <script src="/chemin.js"></script>
-      
+	<meta charset="utf-8" />
+	<title>buz40 : bouton</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/chemin.js"></script>
 
 <script>
 	var serveur = io.connect(racineURL);
-	
 
 	// En commençant, le bouton ne sait pas il est à qui, il joue où, ni avec qui.
 	var noSeqBouton = <%= noSeqBouton %>;
@@ -22,7 +19,6 @@
 	// Peut-être a-t-il utilisé l'URL donné par la console?
 	const urlParams = new URLSearchParams(window.location.search);
 	cherchePlateau = urlParams.get('no');
-	
 
 	// Identification du joueur
 	function identification() {
@@ -37,13 +33,14 @@
 									cherchePlateau: cherchePlateau});
 	};
 
+	// Pour éviter qu'un joueur oublie d'enter son nom
 	function validerNomNonVide() {
-	 if(document.getElementById("formJoueur").value==="") { 
-            document.getElementById('formAcceder').disabled = true; 
-        } else { 
-            document.getElementById('formAcceder').disabled = false;
-        }
-    }
+		if (document.getElementById("formJoueur").value === "") {
+			document.getElementById('formAcceder').disabled = true;
+		} else {
+			document.getElementById('formAcceder').disabled = false;
+		}
+	}
 
 	// Entrée sur un plateau acceptée
 	var numeroPlateau = undefined;
@@ -86,39 +83,31 @@
 			document.getElementById("buzzeur").classList.add("btn-primary");
 		});
 
-
-
 		plateau.on('erreur', () => {
   			window.alert("Erreur de la console, prière de redémarrer.");
 		});
  
+		// pas très chic, mais permet de buzzer avec ENTER ou ESPACE
+		document.addEventListener("keydown", function (event) {
+			// Number 13 is the "Enter" key on the keyboard and 32 is "Space"
+			if (event.keyCode === 13 || event.keyCode == 32) {
+				// Cancel the default action, if needed
+				event.preventDefault();
+				// Trigger the button element with a click
+				document.getElementById("buzzeur").click();
+			}
+		});
 	};
 
 	function buzz() {
-
 		window.plateau.emit('signal', {nomJoueur: nomJoueur, noSeqBouton: noSeqBouton});
 	};
-
-
-// pas très chic, mais permet de buzzer avec ENTER
-	document.addEventListener("keydown", function(event) {
-  	// Number 13 is the "Enter" key on the keyboard and 32 is "Space"
-  		if (event.keyCode === 13 || event.keyCode == 32) {
-    	// Cancel the default action, if needed
-   		 event.preventDefault();
-   		 // Trigger the button element with a click
-   		 document.getElementById("buzzeur").click();
-  }
-});
 
 </script>
 
 </head>
   <body>
     <div class="container">
-
-
-
 
 	<div class="container" id="formulaireID" style="display: inline">
 	    <div class="container">
@@ -127,7 +116,7 @@
         <table border=0><tr valign=bottom>
   			<td>
   				  <label for="formJoueur">Nom</label><br />
-  				  <input type="text" class="form-control" id="formJoueur" placeholder="Nom" onkeyup="validerNomNonVide()">
+  				  <input type="text" class="form-control" id="formJoueur" placeholder="Nom" oninput="validerNomNonVide()">
   			</td>
   			<td>
   				  <label for="exampleInputEmail2">Plateau</label><br />
