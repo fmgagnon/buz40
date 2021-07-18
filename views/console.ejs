@@ -49,9 +49,6 @@
 	var joueursPlateau = [];
 	var equipeA = [];
 	var equipeB = [];
-	var contenuAffichageJoueurs = ''
-	var contenuAffichageLumieres = '';
-	var contenuAffichageFeuille = '';
 
 	var trouveJoueur;
 	var pointageA = 0;
@@ -107,14 +104,11 @@
 		console.log(joueursPlateau);
 		
 		majAffichageLumieres();
-		document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
 				
 		majAffichageJoueurs();
-		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
 
 		
 		majAffichageFeuille();
-		document.getElementById("affichageFeuille").innerHTML = contenuAffichageFeuille;	
 		
 		
 		if (document.getElementById("pointageSecret").checked) {
@@ -148,7 +142,7 @@
 	// Affichage de la fenêtre de configuration
 	function majAffichageJoueurs() {
 	
-		contenuAffichageJoueurs = '<center><table border=1><tr><td>nom</td><td>équipe</td><td></td></tr>'
+		var contenuAffichageJoueurs = '<center><table border=1><tr><td>nom</td><td>équipe</td><td></td></tr>'
 	
 		for (iAffichageJoueurs = 0; (iAffichageJoueurs < joueursPlateau.length); iAffichageJoueurs++) { 
 			contenuAffichageJoueurs += '<tr><td id="configNom' + iAffichageJoueurs + '">' + joueursPlateau[iAffichageJoueurs].nomJoueur + '</td>'+
@@ -173,13 +167,14 @@
 		};
 		contenuAffichageJoueurs += '</tr></table></center>';
 	
+		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
 	}
 
 
 	// Affichage de la console
 	function majAffichageLumieres(){
 	
-	contenuAffichageLumieres = '<div class="row">'+
+	var contenuAffichageLumieres = '<div class="row">'+
 								'<div class="col-sm">'+
 								'<h2>Équipe A ('+ nomEquipeA + ') : <span id="scoreA">0</span></h2>';
 	
@@ -210,7 +205,7 @@
 
 		contenuAffichageLumieres +='</div></div>';
 
-		
+		document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
 	
 	};
 
@@ -221,14 +216,13 @@
 
 	// Affichage de la feuille de pointage
 	function majAffichageFeuille() {
-		contenuAffichageFeuille = '';
-		contenuAffichageFeuille += '<div class="row">'+
-								'<div class="col-sm">'+
-								'<table border=1 align=center>'+
-								'<tr>'+
-								'<td><strong>Équipe A ('+ nomEquipeA + ')</strong></td>'+
-								'<td id="score2A"><strong>' + pointageA + '</strong/</td>'+
-								'<td>ajustement</td></tr>';
+		var contenuAffichageFeuille = '<div class="row">'+
+										'<div class="col-sm">'+
+										'<table border=1 align=center>'+
+										'<tr>'+
+										'<td><strong>Équipe A ('+ nomEquipeA + ')</strong></td>'+
+										'<td id="score2A"><strong>' + pointageA + '</strong/</td>'+
+										'<td>ajustement</td></tr>';
 	
 		for (iAffichageFeuille = 0; iAffichageFeuille < (equipeA.length); iAffichageFeuille++) { 
 			contenuAffichageFeuille += '<tr><td>' + equipeA[iAffichageFeuille].nomJoueur +
@@ -307,7 +301,6 @@
 								 "score" : 0});			
 			console.log(joueursPlateau);
 			majAffichageJoueurs();
-		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
 		
 		for (iAffichageJoueurs = 0; (iAffichageJoueurs < joueursPlateau.length); iAffichageJoueurs++) { 
 			if (joueursPlateau[iAffichageJoueurs].equipe == "A") {
@@ -475,7 +468,6 @@ function envoiResultat(){
 					<div class="container" id="affichageJoueurs">
 						<script>
 							majAffichageJoueurs();
-							document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
 						</script>
 					</div>
 					<hr>
@@ -502,7 +494,6 @@ function envoiResultat(){
 	<div class="container" id="affichageLumieres">
 		<script>
 			majAffichageLumieres();
-			document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
 		</script>
 
 	</div>
