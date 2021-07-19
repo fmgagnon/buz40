@@ -69,6 +69,7 @@
 		// Initialisons-le à 50% par défaut.
 		document.getElementById("ding").volume = 0.5;
 
+		// Ajout des "joueurs" Équipe A et Équipe B, pour marquer les points d'équipe
 		joueursPlateau.push({
 			"nomJoueur": "Équipe A",
 			"noSeqBouton": 1,
@@ -82,6 +83,29 @@
 			"score": 0
 		});
 		majAffichageJoueurs();
+
+		// Permet d'attribuer les points avec les touches + et -
+		document.addEventListener("keyup", function (event) {
+			// S'applique seulement si un joueur a buzzé
+			if (joueurSelect === '') {
+				return;
+			}
+			// Utiliser la touche '+' pour un +10
+			if (event.keyCode === 107 || event.keyCode == 187) {
+				event.preventDefault();
+				document.getElementById("btnPlus").click();
+			}
+			// Utiliser la touche '-' pour un -10
+			else if (event.keyCode === 109 || event.keyCode == 189) {
+				event.preventDefault();
+				document.getElementById("btnMoins").click();
+			}
+			// Utiliser la touche '0' pour réarmer
+			else if (event.keyCode === 48 || event.keyCode == 96) {
+				event.preventDefault();
+				document.getElementById("btnRearmer").click();
+			}
+		});
 	}
 	
 	function majEquipes(){
@@ -209,9 +233,9 @@
 		// Colonne du milieu
 		contenuAffichageLumieres += '</div>'+
 						'<div class="col-sm">'+
-						'<button type="button" class="btn btn-info" onClick="debuzz();">Réarmer</button> <br /><br />'+
-						'<button type="button" class="btn btn-success" onClick="ajustPointage(joueurSelect,10);">Bonne réponse (+10)</button><br /><br />'+
-						'<button type="button" class="btn btn-danger" onClick="ajustPointage(joueurSelect,-10);">Pénalité (-10)</button><br />'+
+						'<button type="button" id="btnRearmer" class="btn btn-info" onClick="debuzz();">Réarmer</button> <br /><br />'+
+						'<button type="button" id="btnPlus" class="btn btn-success" onClick="ajustPointage(joueurSelect,10);">Bonne réponse (+10)</button><br /><br />'+
+						'<button type="button" id="btnMoins" class="btn btn-danger" onClick="ajustPointage(joueurSelect,-10);">Pénalité (-10)</button><br />'+
 						'<br /><br />'+
 						'<button type="button" class="btn btn-sm btn-info"  data-toggle="modal" data-target="#feuillePointage" >Feuille de pointage</button>';
 
