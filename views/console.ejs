@@ -27,6 +27,7 @@
 	var numeroBouton = <%= numeroBouton %>;
 	var nomJuge = "<%= nomJuge %>";
 	var urlBase = racineURL + 'bouton/?no=';
+	var urlBouton = urlBase + numeroBouton;
 	console.log(noPlateau);
 	
 	var i = 0;
@@ -48,9 +49,8 @@
 	var joueursPlateau = [];
 	var equipeA = [];
 	var equipeB = [];
-	var contenuAffichageJoueurs = ''
-	var contenuAffichageLumieres = '';
-	var contenuAffichageFeuille = '';
+
+	var nbJoueurs = 0;
 
 	var trouveJoueur;
 	var pointageA = 0;
@@ -62,17 +62,57 @@
 	var autodebuzz;
 	var resultatExport = "";
 
+	// fonction appelée au moment où la page est loadée
+	function initialisation()
+	{
+		// Certains joueurs se plaignent que le volume de la sonnette est trop fort...
+		// Initialisons-le à 50% par défaut.
+		document.getElementById("ding").volume = 0.5;
 
-	
-	
-	function majConfig(){
+		// Ajout des "joueurs" Équipe A et Équipe B, pour marquer les points d'équipe
+		joueursPlateau.push({
+			"nomJoueur": "Équipe A",
+			"noSeqBouton": 1,
+			"equipe": 'A',
+			"score": 0
+		});
+		joueursPlateau.push({
+			"nomJoueur": "Équipe B",
+			"noSeqBouton": 2,
+			"equipe": 'B',
+			"score": 0
+		});
+		majAffichageJoueurs();
 
-		nomEquipeA = document.getElementById("nomEquipeA").value;
-		nomEquipeB = document.getElementById("nomEquipeB").value;
-		
+		// Permet d'attribuer les points avec les touches + et -
+		document.addEventListener("keyup", function (event) {
+			// S'applique seulement si un joueur a buzzé
+			if (joueurSelect === '') {
+				return;
+			}
+			// Utiliser la touche '+' pour un +10
+			if (event.keyCode === 107 || event.keyCode == 187) {
+				event.preventDefault();
+				document.getElementById("btnPlus").click();
+			}
+			// Utiliser la touche '-' pour un -10
+			else if (event.keyCode === 109 || event.keyCode == 189) {
+				event.preventDefault();
+				document.getElementById("btnMoins").click();
+			}
+			// Utiliser la touche '0' pour réarmer
+			else if (event.keyCode === 48 || event.keyCode == 96) {
+				event.preventDefault();
+				document.getElementById("btnRearmer").click();
+			}
+		});
+	}
+	
+	function majEquipes(){
+
 		joueursPlateau.concat(equipeA);		
 		joueursPlateau.concat(equipeB);
-		console.log("tous les joueurs dans la liste commune");
+		console.log("Tous les joueurs dans la liste commune:");
 		console.log(joueursPlateau);
 		
 		for (iConfig = 0; iConfig < joueursPlateau.length; iConfig++) {
@@ -83,33 +123,35 @@
 			} else if (document.getElementById("eBJoueur" + iConfig).checked) {
 				joueursPlateau[iConfig].equipe = "B";
 			};
-			console.log("majconfig" + iConfig +" : le joueur" + joueursPlateau[iConfig].nomJoueur + "va dans l'équipe " + joueursPlateau[iConfig].equipe + ".");			
+			console.log("majconfig" + iConfig +" : le joueur " + joueursPlateau[iConfig].nomJoueur + " va dans l'équipe " + joueursPlateau[iConfig].equipe + ".");			
 		};
 		
 		// Rafraîchissement des équipes
 		equipeA = joueursPlateau.filter((joueur) => { return joueur.equipe == "A"; });
-		equipeB = joueursPlateau.filter((joueur) => { return joueur.equipe == "B"; });		
+		equipeB = joueursPlateau.filter((joueur) => { return joueur.equipe == "B"; });
+	}
+
+	function majConfig(){
+
+		nomEquipeA = document.getElementById("nomEquipeA").value;
+		nomEquipeB = document.getElementById("nomEquipeB").value;
 		
+		majEquipes();
 		
-		delaiDebuzz = document.getElementById("nouveauDelai").value;		
-		
-		console.log("A :");
+		console.log("Equipe A :");
 		console.log(equipeA);
-		console.log("B :");
+		console.log("Equipe B :");
 		console.log(equipeB);
-		console.log("tous")
+		console.log("Tous les joueurs:")
 		console.log(joueursPlateau);
 		
 		majAffichageLumieres();
-		document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
 				
 		majAffichageJoueurs();
-		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
-
 		
 		majAffichageFeuille();
-		document.getElementById("affichageFeuille").innerHTML = contenuAffichageFeuille;	
 		
+		delaiDebuzz = document.getElementById("nouveauDelai").value;	
 		
 		if (document.getElementById("pointageSecret").checked) {
 			document.getElementById("scoreA").style.visibility = "hidden";
@@ -120,9 +162,7 @@
 			document.getElementById("scoreB").style.color = "black";
 		};	
 	
-	debuzz();
-	
-		
+		debuzz();
 	};
 
 
@@ -131,51 +171,58 @@
 		console.log('supprime', joueursPlateau[numeroJoueur].nomJoueur)
 		document.getElementById("configNom" + numeroJoueur).innerHTML = '';
 		joueursPlateau.splice(numeroJoueur, 1);
-				console.log(joueursPlateau);
-
+		nbJoueurs--;
+		document.getElementById("nbJoueursConnectes").innerText = nbJoueurs;
+		console.log(joueursPlateau);
 		majConfig();
-		
-
 	}
 
 	
 	// Affichage de la fenêtre de configuration
 	function majAffichageJoueurs() {
 	
-		contenuAffichageJoueurs = '<center><table border=1><tr><td>nom</td><td>équipe</td><td></td></tr>'
+		var contenuAffichageJoueurs = '<center><table border=1><tr><td><b>Joueur</b></td><td><b>Équipe</b></td><td></td></tr>'
 	
-		for (iAffichageJoueurs = 0; (iAffichageJoueurs < joueursPlateau.length); iAffichageJoueurs++) { 
+		// "Joueurs" statiques (Équipe A et Équipe B)
+		for (iAffichageJoueurs = 0; iAffichageJoueurs < 2 && iAffichageJoueurs < joueursPlateau.length; iAffichageJoueurs++) { 
 			contenuAffichageJoueurs += '<tr><td id="configNom' + iAffichageJoueurs + '">' + joueursPlateau[iAffichageJoueurs].nomJoueur + '</td>'+
 			'<td>'+
-			'A<input type="radio" name="equipeJoueur'+ iAffichageJoueurs +'" id="eAJoueur' + iAffichageJoueurs + '">'+
+			'A<input type="radio" name="equipeJoueur'+ iAffichageJoueurs +'" id="eAJoueur' + iAffichageJoueurs + '" disabled> '+
+			'<input type="radio" name="equipeJoueur'+ iAffichageJoueurs +'" id="eBJoueur' + iAffichageJoueurs + '" disabled>'+'B</td>'+
+			'<td></td>';
+		};
+
+		// "Vrai" joueurs
+		for (iAffichageJoueurs = 2; iAffichageJoueurs < joueursPlateau.length; iAffichageJoueurs++) { 
+			contenuAffichageJoueurs += '<tr><td id="configNom' + iAffichageJoueurs + '">' + joueursPlateau[iAffichageJoueurs].nomJoueur + '</td>'+
+			'<td>'+
+			'A<input type="radio" name="equipeJoueur'+ iAffichageJoueurs +'" id="eAJoueur' + iAffichageJoueurs + '"> '+
 			'<input type="radio" name="equipeJoueur'+ iAffichageJoueurs +'" id="eBJoueur' + iAffichageJoueurs + '">'+'B</td>'+
 			'<td><button type="button" class="btn btn-sm btn-warning" onclick="supprimeJoueur(' + iAffichageJoueurs + ')">supprimer</button></td>';
-			
-			// Identifier l'équipe sur le bouton radio.
-			// Ne fonctionne pas pour l'instant. Pourquoi? Je ne sais pas.
-			// Le IF fonctionne.
-			
-			
+		};
+
+		contenuAffichageJoueurs += '</tr></table></center>';
+	
+		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
+
+		// Rétablir les équipes
+		for (iAffichageJoueurs = 0; (iAffichageJoueurs < joueursPlateau.length); iAffichageJoueurs++) { 
 			if (joueursPlateau[iAffichageJoueurs].equipe == "A") {
 				document.getElementById("eAJoueur" + iAffichageJoueurs).checked = true;
 				
 			} else if (joueursPlateau[iAffichageJoueurs].equipe == "B") {
 				document.getElementById("eBJoueur" + iAffichageJoueurs).checked = true;
 			};
-			
-			
-		};
-		contenuAffichageJoueurs += '</tr></table></center>';
-	
+		}
 	}
 
 
 	// Affichage de la console
 	function majAffichageLumieres(){
 	
-	contenuAffichageLumieres = '<div class="row">'+
-								'<div class="col-sm">'+
-								'<h2>Équipe A ('+ nomEquipeA + ') : <span id="scoreA">0</span></h2>';
+		var contenuAffichageLumieres = '<div class="row">'+
+									'<div class="col-sm">'+
+									'<h2>Équipe A ('+ nomEquipeA + ') : <span id="scoreA">0</span></h2>';
 	
 		for (iAffichageLumieres = 0; iAffichageLumieres < (equipeA.length); iAffichageLumieres++) { 
 			contenuAffichageLumieres += '<button type="button" class="btn btn-secondary" id="lum' + equipeA[iAffichageLumieres].noSeqBouton + '">' + equipeA[iAffichageLumieres].nomJoueur + '</button>'+
@@ -186,9 +233,9 @@
 		// Colonne du milieu
 		contenuAffichageLumieres += '</div>'+
 						'<div class="col-sm">'+
-						'<button type="button" class="btn btn-info" onClick="debuzz();">Réarmer</button> <br /><br />'+
-						'<button type="button" class="btn btn-success" onClick="ajustPointage(joueurSelect,10);">Bonne réponse (+10)</button><br /><br />'+
-						'<button type="button" class="btn btn-danger" onClick="ajustPointage(joueurSelect,-10);">Pénalité (-10)</button><br />'+
+						'<button type="button" id="btnRearmer" class="btn btn-info" onClick="debuzz();">Réarmer</button> <br /><br />'+
+						'<button type="button" id="btnPlus" class="btn btn-success" onClick="ajustPointage(joueurSelect,10);">Bonne réponse (+10)</button><br /><br />'+
+						'<button type="button" id="btnMoins" class="btn btn-danger" onClick="ajustPointage(joueurSelect,-10);">Pénalité (-10)</button><br />'+
 						'<br /><br />'+
 						'<button type="button" class="btn btn-sm btn-info"  data-toggle="modal" data-target="#feuillePointage" >Feuille de pointage</button>';
 
@@ -204,7 +251,7 @@
 
 		contenuAffichageLumieres +='</div></div>';
 
-		
+		document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
 	
 	};
 
@@ -215,14 +262,13 @@
 
 	// Affichage de la feuille de pointage
 	function majAffichageFeuille() {
-		contenuAffichageFeuille = '';
-		contenuAffichageFeuille += '<div class="row">'+
-								'<div class="col-sm">'+
-								'<table border=1 align=center>'+
-								'<tr>'+
-								'<td><strong>Équipe A ('+ nomEquipeA + ')</strong></td>'+
-								'<td id="score2A"><strong>' + pointageA + '</strong/</td>'+
-								'<td>ajustement</td></tr>';
+		var contenuAffichageFeuille = '<div class="row">'+
+										'<div class="col-sm">'+
+										'<table border=1 align=center>'+
+										'<tr>'+
+										'<td><strong>Équipe A ('+ nomEquipeA + ')</strong></td>'+
+										'<td id="score2A"><strong>' + pointageA + '</strong/</td>'+
+										'<td>ajustement</td></tr>';
 	
 		for (iAffichageFeuille = 0; iAffichageFeuille < (equipeA.length); iAffichageFeuille++) { 
 			contenuAffichageFeuille += '<tr><td>' + equipeA[iAffichageFeuille].nomJoueur +
@@ -252,7 +298,6 @@
 		
 		document.getElementById("score2A").innerHTML = pointageA;
 		document.getElementById("score2B").innerHTML = pointageB;
-	
 	}
 
 
@@ -296,28 +341,22 @@
     plateau.on('allo', function(msg){
  		console.log('allo', msg.nomJoueur);
 
-			joueursPlateau.push({"nomJoueur" : msg.nomJoueur,
-								 "noSeqBouton" : msg.noSeqBouton,
-								 "equipe" : '',
-								 "score" : 0});			
-			console.log(joueursPlateau);
-			majAffichageJoueurs();
-		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
-		
-		for (iAffichageJoueurs = 0; (iAffichageJoueurs < joueursPlateau.length); iAffichageJoueurs++) { 
-			if (joueursPlateau[iAffichageJoueurs].equipe == "A") {
-				document.getElementById("eAJoueur" + iAffichageJoueurs).checked = true;
-			} else if (joueursPlateau[iAffichageJoueurs].equipe == "B") {
-				document.getElementById("eBJoueur" + iAffichageJoueurs).checked = true;
-			};
-		};
-		
-		
-		
+		// pour se souvenir des assignations d'équipes qui viennent d'être faites
+		majEquipes();
+
+		// Ajout du nouveau joueur
+		joueursPlateau.push({"nomJoueur" : msg.nomJoueur,
+								"noSeqBouton" : msg.noSeqBouton,
+								"equipe" : '',
+								"score" : 0});
+		nbJoueurs++;
+		document.getElementById("nbJoueursConnectes").innerText = nbJoueurs;
+
+		majAffichageJoueurs();
 	});
 
 
-		plateau.on('droitReponse', function (msg) {
+	plateau.on('droitReponse', function (msg) {
 
 		for (iDebuzz = 0; iDebuzz < joueursPlateau.length; iDebuzz++) { 
 			document.getElementById("lum" + 								
@@ -391,6 +430,14 @@ function changementDelai(){
 	document.getElementById("delaiDebuzz").innerHTML = delaiDebuzz;
 }
 
+function copyToClipboard(text) {
+	navigator.clipboard.writeText(text).then(function () {
+		console.log('Async: Copying to clipboard was successful!');
+	}, function (err) {
+		console.error('Async: Could not copy text: ', err);
+	});
+}
+
 
 function envoiResultat(){
 
@@ -429,106 +476,92 @@ function envoiResultat(){
 
 
 
-<body>
-<div class="container">         
+<body onload="initialisation()">
+<div class="container">
+	<div class="jumbotron">
+		<div class="container">
+			<h1>
+				<script>document.write(nomRegie)</script> - plateau
+				<script>document.write(nomJuge)</script>
+			</h1>
 
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="boutonInscription" onclick="window.plateau.emit('rouvert', {noPlateau: noPlateau});">
+				Configurer la partie</button>
 
-    <div class="jumbotron">
-      <div class="container">
-        <h1><script>document.write(nomRegie)</script> - plateau  <script>document.write(nomJuge)</script></h1>
-
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="boutonInscription" onclick="window.plateau.emit('rouvert', {noPlateau: noPlateau});">
-Configurer la partie</button> <button type="button" style="visibility:hidden" class="btn btn-secondary" id="lum0"></button><br /><br />
-      </div>
+		</div>
 	</div>
-	
+	<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
 
+				<div class="modal-body">
+					<strong>Premièrement</strong>, envoyez ce lien aux gens qui s'apprêtent à jouer&nbsp;:
+					<br />
+					<code><script id="lienBouton">document.write(urlBouton);</script></code>
+					<button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard(urlBouton);">Copier</button>
+					<hr>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
+					<strong>Ensuite</strong>, organisez les équipes :
+					<br /> Équipe A :
+					<input type="text" id="nomEquipeA" maxlength=3 size=3>. Équipe B :
+					<input type="text" id="nomEquipeB" maxlength=3 size=3>.
+					<br />
+					<br />
+					<div class="container" id="affichageJoueurs">
+						<script>
+							majAffichageJoueurs();
+						</script>
+					</div>
+					<br /> Joueurs connectés: <b><span id="nbJoueursConnectes">0</script></span></b>
+					<hr>
+					<strong>Options : </strong>
+					<br /> Garder le pointage secret (pour partage d'écran)&nbsp;:
+					<input type="checkbox" id="pointageSecret">
+					<br /> Délai de réarmement automatique&nbsp;:
+					<input type="range" id="nouveauDelai" min="3500" max="10000" value="3500" onchange="changementDelai();">
+					<span id="delaiDebuzz">3500</span> ms.
+					<br />
+					<br />
+					Pour tester et ajuster le volume de la sonnette:
+					<br />
+					<audio src="http://buz40.com/ding.wav" id="ding" controls=yes></audio>
+				</div>
 
-      <div class="modal-body">
-      <strong>Premièrement</strong>, envoyez ce lien aux gens qui s'apprêtent à jouer&nbsp;: <br /><code><script>document.write(urlBase + numeroBouton);</script></code>
-      <hr>
-      
-      <strong>Ensuite</strong>, organisez les équipes : <br />
-Équipe A : <input type="text" id="nomEquipeA" maxlength=3 size=3>.
-Équipe B : <input type="text" id="nomEquipeB" maxlength=3 size=3>.<br />
-<div class="container" id="affichageJoueurs">
-      
-<script>
-majAffichageJoueurs();
-		document.getElementById("affichageJoueurs").innerHTML = contenuAffichageJoueurs;
-			
-</script>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.plateau.emit('ferme', {noPlateau: noPlateau}); majConfig(); console.log('prêt');">Prêt</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-</div>
-<hr>
-<strong>Options : </strong><br />
-Garder le pointage secret (pour partage d'écran)&nbsp;:<input type="checkbox" id="pointageSecret"><br />
-Délai de réarmement automatique&nbsp;: <input type="range" id="nouveauDelai" min="3500" max="10000" value="3500" onchange="changementDelai();"><span id="delaiDebuzz">3500</span> ms.<br />
+	<div class="container" id="affichageLumieres">
+		<script>
+			majAffichageLumieres();
+		</script>
 
-      </small>
-      </div>
-      
-      <div class="modal-footer">
-      Afin d'entendre une sonnette, faites jouer ce son : 
-<audio src="http://buz40.com/ding.wav" id="ding" controls=yes></audio> 
-        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.plateau.emit('ferme', {noPlateau: noPlateau}); majConfig(); console.log('prêt');">Prêt</button>
-      </div>
-    </div>
-  </div>
-</div>
+	</div>
 
+	<div class="modal fade" id="feuillePointage" tabindex="-1" role="dialog" aria-labelledby="labelFeuillePointage" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="labelFeuillePointage">Feuille de pointage</h5>
 
+				</div>
+				<div class="modal-body">
+					<div class="container" id="affichageFeuille">
+					</div>
 
+				</div>
 
-
-<div class="container" id="affichageLumieres">
-<script>
-		majAffichageLumieres();
-		document.getElementById("affichageLumieres").innerHTML = contenuAffichageLumieres;
-</script>
-
-</div>
-
-
-
-
-<div class="modal fade" id="feuillePointage" tabindex="-1" role="dialog" aria-labelledby="labelFeuillePointage" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="labelFeuillePointage">Feuille de pointage</h5>
-
-      </div>
-      <div class="modal-body">
-      <div class="container" id="affichageFeuille">
-      </div>
-      
-      </div>
-      
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Cacher</button>
-
-        
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Cacher</button>
+			</div>
+		</div>
+	</div>
 
 
 </div>
-
-
-
-
-
+</div>
 </div>
 </head>
 </html>
