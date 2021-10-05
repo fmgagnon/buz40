@@ -106,6 +106,16 @@
 				document.getElementById("btnRearmer").click();
 			}
 		});
+
+		// Vérifions si le navigateur a la permission d'accéder au clipboard - et donc 
+		// si c'est pertinent d'afficher le bouton pour copier l'url du buzzer
+		navigator.permissions.query({name:'clipboard-write'}).then(function(result) {
+			if (result.state == 'granted') {
+				document.getElementById("btnCopier").hidden=false;
+			} else {
+				document.getElementById("btnCopier").hidden=true;
+			}
+		});
 	}
 	
 	function majEquipes(){
@@ -438,6 +448,7 @@ function changementDelai(){
 	document.getElementById("delaiDebuzz").innerHTML = delaiDebuzz;
 }
 
+// Cette fonction requiert la permission d'accéder au clipboard, que le navigateur accorde uniquement aux sites https
 function copyToClipboard(text) {
 	navigator.clipboard.writeText(text).then(function () {
 		console.log('Async: Copying to clipboard was successful!');
@@ -506,7 +517,7 @@ function envoiResultat(){
 					<strong>Premièrement</strong>, envoyez ce lien aux gens qui s'apprêtent à jouer&nbsp;:
 					<br />
 					<code><script id="lienBouton">document.write(urlBouton);</script></code>
-					<button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard(urlBouton);">Copier</button>
+					<button class="btn btn-outline-primary btn-sm" id="btnCopier" hidden="true" onclick="copyToClipboard(urlBouton);">Copier</button>
 					<hr>
 
 					<strong>Ensuite</strong>, organisez les équipes :
