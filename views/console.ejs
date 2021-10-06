@@ -362,15 +362,36 @@
 		// pour se souvenir des assignations d'équipes qui viennent d'être faites
 		majEquipes();
 
-		// Ajout du nouveau joueur
-		joueursPlateau.push({"nomJoueur" : msg.nomJoueur,
-								"noSeqBouton" : msg.noSeqBouton,
-								"equipe" : '',
-								"score" : 0});
-		nbJoueurs++;
-		document.getElementById("nbJoueursConnectes").innerText = nbJoueurs;
+		var memeJoueur = false;
+		var joueurTrouve = joueursPlateau.find(j => j.nomJoueur == msg.nomJoueur);
+		if (joueurTrouve)
+		{
+			console.log(`trouvé un autre joueur qui s'appelle ${msg.nomJoueur}`);
+			var memeJoueur = window.confirm(`Un deuxième joueur nommé ${msg.nomJoueur} vient de se connecter.  S'agit-il de la même personne? \n Cliquez OK pour associer ce nouveau bouton au joueur préexistant, ou Annuler pour inscrire un deuxième joueur avec le même nom.`);
+		}
+
+		if (memeJoueur)
+		{
+			// On attribue le nouvel identifiant au joueur existant
+			joueurTrouve.noSeqBouton = msg.noSeqBouton;
+		}
+		else
+		{
+			// Ajout du nouveau joueur
+			joueursPlateau.push({"nomJoueur" : msg.nomJoueur,
+									"noSeqBouton" : msg.noSeqBouton,
+									"equipe" : '',
+									"score" : 0});
+			nbJoueurs++;
+			document.getElementById("nbJoueursConnectes").innerText = nbJoueurs;
+		}
+
+		
+		console.log("Tous les joueurs:")
+		console.log(joueursPlateau);
 
 		majAffichageJoueurs();
+		majAffichageLumieres();
 	});
 
 

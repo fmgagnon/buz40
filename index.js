@@ -173,7 +173,7 @@ function creerConsole(compteurConsole, numeroBouton, nomJuge, nomRegie) {
     		
 
     		socket.on('signal', function(msg) {
-				console.log(compteurConsole, 'signal', msg.nomJoueur);
+				console.log(compteurConsole, `signal ${msg.nomJoueur} (${msg.noSeqBouton})`);
 				if (plateaux[compteurConsole].etatBouton == 0) {
 			  		plateaux[compteurConsole].etatBouton = 1;
 			  		plateaux[compteurConsole].droitReponse = msg.nomJoueur;
