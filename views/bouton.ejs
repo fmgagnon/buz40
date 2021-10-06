@@ -57,7 +57,6 @@
 	// Entrée sur un plateau refusée : affichage d'un message d'erreur
 	serveur.on('non_merci', function(msg){
 		window.alert("Entrée refusée : " + msg);
-		window.location.reload(true);
 	});
 
 	// La mécanique du match en tant que tel
