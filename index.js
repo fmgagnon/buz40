@@ -100,12 +100,12 @@ var serveur = io
 // Code de feuilles de pointage, désactivé pour le moment.
 
 
-// var csvResultats = "'plateau', 'id. du match', 'nom équipe A', 'score équipe A', 'nom équipe B', 'score équipe B', 'heure', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score'";
+var csvResultats = "'plateau', 'id. du match', 'nom équipe A', 'score équipe A', 'nom équipe B', 'score équipe B', 'heure', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score'";
 
-// function ajoutResultat(aAjouter) {
-// 	csvResultats += "\n" + aAjouter;
-// 	console.log(csvResultats);
-// };
+function ajoutResultat(aAjouter) {
+	csvResultats += "\n" + aAjouter;
+	console.log(csvResultats);
+};
 
 
 
@@ -185,11 +185,11 @@ function creerConsole(compteurConsole, numeroBouton, nomJuge, nomRegie) {
   
 			});
 
-    		// socket.on('ajoutResultat', function(msg){    			
-			// 	ajoutResultat(msg);
-			//	console.log(compteurConsole, 'recu resultats');
+    		socket.on('ajoutResultat', function(msg){    			
+				ajoutResultat(msg);
+				console.log(compteurConsole, 'recu resultats');
 
-    		// });
+    		});
     		
     	
     	    	
@@ -334,18 +334,14 @@ function detruireConsole(numeroConsole) {
 		
 		res.send('oupelaille')
 		
-	}    
-	
-	
-	
+	}
+});
 
+	// Pour retrouver les résultats à l'url /nomDeRégie/resultats.csv
+	app.get('/:nomRegie' + '/resultats.csv', function (req, res, next) {
+		res.set('Content-Type', 'application/octet-stream');
+		res.send(csvResultats);
 	});
-
-
-// app.get('/' + mdpRegie + '/resultats.csv', function (req, res, next) {
-//	res.set('Content-Type', 'application/octet-stream');
-//	res.send(csvResultats);
-// });
 
 
 

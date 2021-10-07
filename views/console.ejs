@@ -471,15 +471,15 @@ function envoiResultat(){
 					"'" + pointageB + "',"+
 					"'" + new Date().toISOString() + "',";				
 
-	for (iExport = 0; iExport < (equipeA.length); iExport++) { 
-		resultatExport += "'" + equipeA[iAjustPointage].nomJoueur + "'," +
+	for (let iExport = 0; iExport < (equipeA.length); iExport++) { 
+		resultatExport += "'" + equipeA[iExport].nomJoueur + "'," +
 						  "'" + nomEquipeA + "'," + 	 	
-						  "'" + equipeA[iAjustPointage].score + "',";			
+						  "'" + equipeA[iExport].score + "',";			
 		}; 
 
-	for (iExport = 0; iExport < (equipeB.length); iExport++) { 
-		resultatExport += "'" + equipeB[iAjustPointage].nomJoueur + "'," + 	
-						  "'" + equipeB[iAjustPointage].score + "',";			
+	for (let iExport = 0; iExport < (equipeB.length); iExport++) { 
+		resultatExport += "'" + equipeB[iExport].nomJoueur + "'," + 	
+						  "'" + equipeB[iExport].score + "',";			
 		};
 	
 	resultatExport += "''"
@@ -571,6 +571,9 @@ function envoiResultat(){
 					<div class="container" id="affichageFeuille">
 					</div>
 
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="envoiResultat()">Envoyer résultat!</button>
 				</div>
 
 				<button type="button" class="btn btn-primary" data-dismiss="modal">Cacher</button>
