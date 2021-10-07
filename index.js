@@ -329,16 +329,16 @@ function detruireConsole(numeroConsole) {
 		detruireConsole(req.params.numero)
 		res.redirect('/regie/' + req.params.nomRegie + '/' + req.params.jetonRegie)
 
-	} else {
-		console.log("404ish")
-		
-		res.send('oupelaille')
-		
-	}
-});
+		} else {
+			console.log("404ish")
+			
+			res.send('oupelaille')
+			
+		}
+	});
 
-	// Pour retrouver les résultats à l'url /nomDeRégie/resultats.csv
-	app.get('/:nomRegie' + '/resultats.csv', function (req, res, next) {
+	// Pour retrouver les résultats à l'url /resultats/resultats_nomDeRégie.csv
+	app.get('/resultats/resultats_:nomRegie.csv', function (req, res, next) {
 		res.set('Content-Type', 'application/octet-stream');
 		res.send(csvResultats);
 	});
