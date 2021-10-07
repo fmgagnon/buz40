@@ -39,7 +39,7 @@
 	var iDebuzz = 0;
 	var iExport = 0;
 	
-	
+	var incrementPoints = 10;
 	
 	var serveur = io.connect(racineURL);
 	var plateau = io.connect(racineURL + noPlateau);
@@ -244,7 +244,7 @@
 	
 		for (iAffichageLumieres = 0; iAffichageLumieres < (equipeA.length); iAffichageLumieres++) { 
 			contenuAffichageLumieres += '<button type="button" class="btn btn-secondary" id="lum' + equipeA[iAffichageLumieres].noSeqBouton + '">' + equipeA[iAffichageLumieres].nomJoueur + '</button>'+
-			'<button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeA[iAffichageLumieres].noSeqBouton + ', -10)">-10</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeA[iAffichageLumieres].noSeqBouton + ', 10)">+10</button><br /><br />'			
+			'<button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeA[iAffichageLumieres].noSeqBouton + ', -' + incrementPoints +')">-' + incrementPoints +'</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeA[iAffichageLumieres].noSeqBouton + ', ' + incrementPoints +')">+' + incrementPoints +'</button><br /><br />'			
 		};
 
 
@@ -252,8 +252,8 @@
 		contenuAffichageLumieres += '</div>'+
 						'<div class="col-sm">'+
 						'<button type="button" id="btnRearmer" class="btn btn-info" onClick="debuzz();">Réarmer</button> <br /><br />'+
-						'<button type="button" id="btnPlus" class="btn btn-success" onClick="ajustPointage(joueurSelect,10);">Bonne réponse (+10)</button><br /><br />'+
-						'<button type="button" id="btnMoins" class="btn btn-danger" onClick="ajustPointage(joueurSelect,-10);">Pénalité (-10)</button><br />'+
+						'<button type="button" id="btnPlus" class="btn btn-success" onClick="ajustPointage(joueurSelect,' + incrementPoints +');">Bonne réponse (+' + incrementPoints +')</button><br /><br />'+
+						'<button type="button" id="btnMoins" class="btn btn-danger" onClick="ajustPointage(joueurSelect,-' + incrementPoints +');">Pénalité (-' + incrementPoints +')</button><br />'+
 						'<br /><br />'+
 						'<button type="button" class="btn btn-sm btn-info"  data-toggle="modal" data-target="#feuillePointage" >Feuille de pointage</button>';
 
@@ -264,7 +264,7 @@
 		
 		for (iAffichageLumieres = 0; iAffichageLumieres < (equipeB.length); iAffichageLumieres++) { 
 			contenuAffichageLumieres +='<button type="button" class="btn btn-secondary" id="lum' + equipeB[iAffichageLumieres].noSeqBouton + '">' + equipeB[iAffichageLumieres].nomJoueur + '</button>'+
-			'<button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeB[iAffichageLumieres].noSeqBouton + ', -10)">-10</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeB[iAffichageLumieres].noSeqBouton + ', 10)">+10</button><br /><br />';			
+			'<button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeB[iAffichageLumieres].noSeqBouton + ', -' + incrementPoints +')">-' + incrementPoints +'</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeB[iAffichageLumieres].noSeqBouton + ', ' + incrementPoints +')">+' + incrementPoints +'</button><br /><br />';			
 		};
 
 		contenuAffichageLumieres +='</div></div>';
@@ -292,7 +292,7 @@
 			contenuAffichageFeuille += '<tr><td>' + equipeA[iAffichageFeuille].nomJoueur +
 										'</td>'+
 										'<td>' + equipeA[iAffichageFeuille].score + '</td>'+
-										'<td><button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeA[iAffichageFeuille].noSeqBouton + ', -10)">-10</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeA[iAffichageFeuille].noSeqBouton + ', 10)">+10</button></td></tr>';
+										'<td><button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeA[iAffichageFeuille].noSeqBouton + ', -' + incrementPoints +')">-' + incrementPoints +'</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeA[iAffichageFeuille].noSeqBouton + ', ' + incrementPoints +')">+' + incrementPoints +'</button></td></tr>';
 			};
 
 		// Équipe B
@@ -308,7 +308,7 @@
 			contenuAffichageFeuille += '<tr><td>' + equipeB[iAffichageFeuille].nomJoueur +
 										'</td>'+
 										'<td>' + equipeB[iAffichageFeuille].score + '</td>'+
-										'<td><button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeB[iAffichageFeuille].noSeqBouton + ', -10)">-10</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeB[iAffichageFeuille].noSeqBouton + ', 10)">+10</button></td></tr>';
+										'<td><button type="button" class="btn btn-sm btn-warning" onclick="ajustPointage(' + equipeB[iAffichageFeuille].noSeqBouton + ', -' + incrementPoints +')">-' + incrementPoints +'</button><button type="button" class="btn btn-sm btn-success" onclick="ajustPointage(' + equipeB[iAffichageFeuille].noSeqBouton + ', ' + incrementPoints +')">+' + incrementPoints +'</button></td></tr>';
 			};
 
 		contenuAffichageFeuille +='</div></div>';
