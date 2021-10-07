@@ -60,7 +60,6 @@
 	var nomEquipeB = "";
 	
 	var autodebuzz;
-	var resultatExport = "";
 
 	// fonction appelée au moment où la page est loadée
 	function initialisation()
@@ -460,30 +459,20 @@ function copyToClipboard(text) {
 
 function envoiResultat(){
 
+	var resultatExport = noPlateau + "," + nomJuge + "," + nomEquipeA + "," + pointageA + ","+ nomEquipeB + "," + pointageB + ","+ new Date().toISOString() + ",";
 
-
-	resultatExport = "";
-	resultatExport += "'" + noPlateau + "'," + 
-					"'" + nomJuge + "'," + 
-					"'" + nomEquipeA + "'," + 
-					"'" + pointageA + "',"+
-					"'" + nomEquipeB + "'," + 
-					"'" + pointageB + "',"+
-					"'" + new Date().toISOString() + "',";				
-
-	for (let iExport = 0; iExport < (equipeA.length); iExport++) { 
-		resultatExport += "'" + equipeA[iExport].nomJoueur + "'," +
-						  "'" + nomEquipeA + "'," + 	 	
-						  "'" + equipeA[iExport].score + "',";			
+	for (let iExport = 0; iExport < (equipeA.length); iExport++) {
+		resultatExport += equipeA[iExport].nomJoueur + "," +
+						  nomEquipeA + "," +
+						  equipeA[iExport].score + ",";	
 		}; 
 
-	for (let iExport = 0; iExport < (equipeB.length); iExport++) { 
-		resultatExport += "'" + equipeB[iExport].nomJoueur + "'," + 	
-						  "'" + equipeB[iExport].score + "',";			
+	for (let iExport = 0; iExport < (equipeB.length); iExport++) {
+		resultatExport += equipeB[iExport].nomJoueur + "," +
+						  nomEquipeB + "," +
+						  equipeB[iExport].score + ",";
 		};
 	
-	resultatExport += "''"
-
 	console.log(resultatExport);
 	window.plateau.emit('ajoutResultat', resultatExport);
 

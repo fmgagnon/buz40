@@ -97,13 +97,11 @@ var serveur = io
 
 
 
-// Code de feuilles de pointage, désactivé pour le moment.
-
-
-var csvResultats = "'plateau', 'id. du match', 'nom équipe A', 'score équipe A', 'nom équipe B', 'score équipe B', 'heure', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score', 'nom', 'equipe', 'score'";
+// Code de feuilles de pointage
+var csvResultats = "plateau, id. du match, nom equipe A, score equipe A, nom equipe B, score equipe B, heure, joueur, equipe, score, joueur, equipe, score, joueur, equipe, score, joueur, equipe, score, joueur, equipe, score, joueur, equipe, score, joueur, equipe, score, joueur, equipe, score, joueur, equipe, score, joueur, equipe, score\n";
 
 function ajoutResultat(aAjouter) {
-	csvResultats += "\n" + aAjouter;
+	csvResultats += aAjouter + "\n";
 	console.log(csvResultats);
 };
 
@@ -188,7 +186,6 @@ function creerConsole(compteurConsole, numeroBouton, nomJuge, nomRegie) {
     		socket.on('ajoutResultat', function(msg){    			
 				ajoutResultat(msg);
 				console.log(compteurConsole, 'recu resultats');
-
     		});
     		
     	
