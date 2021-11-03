@@ -44,8 +44,8 @@
 	var serveur = io.connect(racineURL);
 	var plateau = io.connect(racineURL + noPlateau);
 	
-	var delaiDebuzz = 3500;																										
- 
+	var delaiDebuzz = 3500;
+
 	var joueursPlateau = [];
 	var equipeA = [];
 	var equipeB = [];
@@ -448,6 +448,11 @@ function changementDelai(){
 	document.getElementById("delaiDebuzz").innerHTML = delaiDebuzz;
 }
 
+function changementIncrementPts(){
+	incrementPoints = document.getElementById("nvIncrementPts").value;
+	document.getElementById("incrementPts").innerHTML = incrementPoints;
+}
+
 // Cette fonction requiert la permission d'accéder au clipboard, que le navigateur accorde uniquement aux sites https
 function copyToClipboard(text) {
 	navigator.clipboard.writeText(text).then(function () {
@@ -506,17 +511,10 @@ function envoiResultat(){
 
 			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="boutonInscription" onclick="window.plateau.emit('rouvert', {noPlateau: noPlateau});">
 				Configurer la partie</button>
-
-				<div class="radio">
-					<button type="button" class="btn btn-primary">5</button>
-					<button type="button" class="btn btn-primary active">10</button>
-					<button type="button" class="btn btn-primary">15</button>
-				  </div>
-
 		</div>
 	</div>
 	<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 
 				<div class="modal-body">
@@ -540,12 +538,14 @@ function envoiResultat(){
 					<br /> Joueurs connectés: <b><span id="nbJoueursConnectes">0</script></span></b>
 					<hr>
 					<strong>Options : </strong>
+					<br /> Incrément de points&nbsp;:
+					<input type="range" id="nvIncrementPts" min="5" max="40" value="10" step="5" onchange="changementIncrementPts();">
+					<span id="incrementPts">10</span> pts.
 					<br /> Garder le pointage secret (pour partage d'écran)&nbsp;:
 					<input type="checkbox" id="pointageSecret">
 					<br /> Délai de réarmement automatique&nbsp;:
-					<input type="range" id="nouveauDelai" min="3500" max="10000" value="3500" onchange="changementDelai();">
+					<input type="range" id="nouveauDelai" min="2000" max="10000" value="3500" onchange="changementDelai();">
 					<span id="delaiDebuzz">3500</span> ms.
-					<br />
 					<br />
 					Pour tester et ajuster le volume de la sonnette:
 					<br />
