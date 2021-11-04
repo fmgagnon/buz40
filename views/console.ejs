@@ -160,9 +160,7 @@
 		majAffichageJoueurs();
 		
 		majAffichageFeuille();
-		
-		delaiDebuzz = document.getElementById("nouveauDelai").value;	
-		
+
 		if (document.getElementById("pointageSecret").checked) {
 			document.getElementById("scoreA").style.visibility = "hidden";
 			document.getElementById("scoreB").style.visibility = "hidden";
@@ -443,9 +441,9 @@ debuzz();
 
 
 function changementDelai(){
-	delaiDebuzz = document.getElementById("nouveauDelai").value;
-	console.log(delaiDebuzz)
-	document.getElementById("delaiDebuzz").innerHTML = delaiDebuzz;
+	var delaiDebuzzSec = document.getElementById("nouveauDelai").value;
+	delaiDebuzz = delaiDebuzzSec * 1000;
+	document.getElementById("delaiDebuzz").innerHTML = delaiDebuzzSec;
 }
 
 function changementIncrementPts(){
@@ -544,8 +542,8 @@ function envoiResultat(){
 					<br /> Garder le pointage secret (pour partage d'écran)&nbsp;:
 					<input type="checkbox" id="pointageSecret">
 					<br /> Délai de réarmement automatique&nbsp;:
-					<input type="range" id="nouveauDelai" min="2000" max="10000" value="3500" onchange="changementDelai();">
-					<span id="delaiDebuzz">3500</span> ms.
+					<input type="range" id="nouveauDelai" min="2" max="10" value="3.5" step="0.5" onchange="changementDelai();">
+					<span id="delaiDebuzz">3.5</span> sec.
 					<br />
 					Pour tester et ajuster le volume de la sonnette:
 					<br />
