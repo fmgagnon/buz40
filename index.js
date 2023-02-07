@@ -372,6 +372,16 @@ function detruireConsole(numeroConsole) {
 
 
 		regies.push({nomRegie: req.params.nomRegie, jetonRegie: req.params.jetonRegie, adresseCourriel: req.params.adresseCourriel})
+
+
+	
+		console.log("Régie ", req.params.nomRegie, " créée.");
+
+		let data2 = JSON.stringify(regies);
+		fs.writeFileSync('regies.json', data2);
+
+
+
 		res.redirect('/dieu/'+jetonDieu)
 
 	} else {
